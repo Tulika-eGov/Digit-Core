@@ -42,8 +42,6 @@ public class UserRowMapper implements RowMapper<User> {
             user.setGender(Gender.MALE);
         } else if (rs.getInt("gender") == 3) {
             user.setGender(Gender.OTHERS);
-        } else if (rs.getInt("gender") == 4) {
-            user.setGender(Gender.TRANSGENDER);
         }
         for (GuardianRelation guardianRelation : GuardianRelation.values()) {
             if (guardianRelation.toString().equals(rs.getString("guardianrelation"))) {

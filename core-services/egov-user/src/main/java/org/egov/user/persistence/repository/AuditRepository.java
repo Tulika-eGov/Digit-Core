@@ -81,9 +81,8 @@ public class AuditRepository {
                 auditInputs.put("gender", 2);
             } else if (Gender.OTHERS.toString().equals(oldUser.getGender().toString())) {
                 auditInputs.put("gender", 3);
-            } else if (Gender.TRANSGENDER.toString().equals(oldUser.getGender().toString())) {
-                auditInputs.put("gender", 4); 
-            } else {
+            }
+            else {
                 auditInputs.put("gender", 0);
             }
         } else {
