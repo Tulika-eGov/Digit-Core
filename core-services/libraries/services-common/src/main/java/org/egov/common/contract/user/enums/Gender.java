@@ -42,5 +42,5 @@ package org.egov.common.contract.user.enums;
 
 public enum Gender {
     //This order should not be interrupted
-    FEMALE, MALE, OTHERS, TRANSGENDER;
+    FEMALE, MALE, OTHERS;
 }
