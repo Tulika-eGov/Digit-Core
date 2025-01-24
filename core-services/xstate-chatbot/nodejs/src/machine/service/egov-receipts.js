@@ -102,8 +102,8 @@ class ReceiptService {
           hi_IN: 'मोबाइल नंबर'
         };
         example = {
-          en_IN: 'Do not use +91 or 0 before mobile number.',
-          hi_IN: 'मोबाइल नंबर से पहले +91 या 0 का उपयोग न करें।'
+          en_IN: 'Do not use +253 before mobile number.',
+          hi_IN: 'मोबाइल नंबर से पहले +253 का उपयोग न करें।'
         }
       }
   
@@ -182,7 +182,7 @@ class ReceiptService {
       state=state.toUpperCase();
 
       if(searchParamOption === 'mobile') {
-        let regexp = new RegExp('^[0-9]{10}$');
+        let regexp = new RegExp('^77[0-9]{6}$');
         return regexp.test(paramInput)
       }
 

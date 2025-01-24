@@ -50,10 +50,10 @@ public class CallbackAPI {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Status value should be 0 to 11");
         }
-        if(!(Pattern.matches("(^[6-9][0-9]{9}$)",mobilenumber))) {
+        if(!(Pattern.matches("(^77[0-9]{6}$)",mobilenumber))) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Mobile number should be of format: \n (i) 91(have 10 digits with starting number with 6 or 7 or 8 or 9) or \n (ii) have 10 digits starting with 6 or 7 or 8 or 9 or \n (iii) in the format +91-(start with 9 or 8 or 7 or 6 with 10 digits)");
+                    .body("Mobile number should be of format: \n (i) 253(have 8 digits with starting number with 77) or \n (ii) have 8 digits starting with 77 or \n (iii) in the format +253-(start with 77 with 8 digits)");
         }
         Report report = new Report();
         report.setJobno(jobno);

@@ -39,7 +39,7 @@ public class UserInfo {
 	private String username = null;
 
 	@JsonProperty("mobile")
-	@Pattern(regexp = "^[0-9]{10}$", message = "MobileNumber should be 10 digit number")
+	@Pattern(regexp = "^77[0-9]{6}$", message = "MobileNumber should be 8 digit number and should start with 77")
 	private String mobile = null;
 
 	@JsonProperty("email")

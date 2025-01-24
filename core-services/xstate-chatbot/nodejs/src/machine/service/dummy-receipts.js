@@ -69,13 +69,13 @@ class DummyReceipts{
           en_IN: 'Mobile Number'
         };
         let example = {
-          en_IN: 'Do not use +91 or 0 before mobile number.'
+          en_IN: 'Do not use +253 before mobile number.'
         }
         return { option, example };
     }
     validateparamInput(service, searchParamOption, paramInput) {
         if(searchParamOption === 'mobile') {
-          let regexp = new RegExp('^[0-9]{10}$');
+          let regexp = new RegExp('^77[0-9]{6}$');
           return regexp.test(paramInput)
         }
         return true;
