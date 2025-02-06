@@ -55,7 +55,7 @@ public class HRMSConstants {
 
 	public static final String INTERNALMICROSERVICEUSER_USERNAME = "INTERNAL_USER";
 
-	public static final String INTERNALMICROSERVICEUSER_MOBILENO = "9999999999";
+	public static final String INTERNALMICROSERVICEUSER_MOBILENO = "77878787";
 
 	public static final String INTERNALMICROSERVICEUSER_TYPE = "SYSTEM";
 
