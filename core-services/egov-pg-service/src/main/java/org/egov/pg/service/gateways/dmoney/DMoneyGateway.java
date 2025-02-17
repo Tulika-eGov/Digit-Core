@@ -94,12 +94,13 @@ public class DMoneyGateway implements Gateway {
 		Map<String, Object> checkoutParams = Map.of(DMoneyConstants.MERCH_APP_ID, appId, DMoneyConstants.MERCH_CODE,
 				merchCode, DMoneyConstants.NONCE_STR, String.valueOf(orderResponse.get(DMoneyConstants.NONCE_STR)),
 				DMoneyConstants.PREPAY_ID, String.valueOf(bizContent.get(DMoneyConstants.PREPAY_ID)),
-				DMoneyConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000), DMoneyConstants.VERSION,
-				DMoneyConstants.VERSION_VAL, DMoneyConstants.TRADE_TYPE, DMoneyConstants.CHECKOUT,
-				DMoneyConstants.LANGUAGE, language);
+				DMoneyConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
 
 		checkoutParams.put(DMoneyConstants.SIGN, DMoneyUtils.generateSignature(checkoutParams, privateKey));
 		checkoutParams.put(DMoneyConstants.SIGN_TYPE, DMoneyConstants.SIGN_ALGORITHM);
+		checkoutParams.put(DMoneyConstants.VERSION, DMoneyConstants.VERSION_VAL);
+		checkoutParams.put(DMoneyConstants.TRADE_TYPE, DMoneyConstants.CHECKOUT);
+		checkoutParams.put(DMoneyConstants.LANGUAGE, language);
 
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		checkoutParams.forEach((key, value) -> params.put(key, List.of(value.toString())));
