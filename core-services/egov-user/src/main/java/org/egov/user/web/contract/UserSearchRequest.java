@@ -44,7 +44,7 @@ public class UserSearchRequest {
     @JsonProperty("aadhaarNumber")
     private String aadhaarNumber;
 
-    @Size(max = 10)
+    @Size(max = 12)
     @JsonProperty("pan")
     private String pan;
 
