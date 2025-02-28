@@ -1,10 +1,12 @@
 package org.egov.pg.service.gateways.dmoney;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import org.egov.pg.models.Transaction;
@@ -53,6 +55,7 @@ public class DMoneyGateway implements Gateway {
 
 	private final RestTemplate restTemplate;
 	private String accessToken;
+	private String expirationDateStr;
 
 	@Autowired
 	public DMoneyGateway(RestTemplate restTemplate, Environment environment, ObjectMapper objectMapper) {
@@ -91,12 +94,14 @@ public class DMoneyGateway implements Gateway {
 					String.valueOf(orderResponse.getOrDefault("msg", "Unknown error occurred.")));
 		}
 
-		Map<String, Object> checkoutParams = Map.of(DMoneyConstants.MERCH_APP_ID, appId, DMoneyConstants.MERCH_CODE,
-				merchCode, DMoneyConstants.NONCE_STR, String.valueOf(orderResponse.get(DMoneyConstants.NONCE_STR)),
-				DMoneyConstants.PREPAY_ID, String.valueOf(bizContent.get(DMoneyConstants.PREPAY_ID)),
+		Map<String, Object> signParams = Map.of(DMoneyConstants.MERCH_APP_ID, appId, DMoneyConstants.NONCE_STR,
+				String.valueOf(orderResponse.get(DMoneyConstants.NONCE_STR)), DMoneyConstants.PREPAY_ID,
+				String.valueOf(bizContent.get(DMoneyConstants.PREPAY_ID)), DMoneyConstants.MERCH_CODE, merchCode,
 				DMoneyConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
 
-		checkoutParams.put(DMoneyConstants.SIGN, DMoneyUtils.generateSignature(checkoutParams, privateKey));
+		String sign = DMoneyUtils.generateSignature(signParams, privateKey);
+		Map<String, Object> checkoutParams = new TreeMap<>(signParams);
+		checkoutParams.put(DMoneyConstants.SIGN, sign);
 		checkoutParams.put(DMoneyConstants.SIGN_TYPE, DMoneyConstants.SIGN_ALGORITHM);
 		checkoutParams.put(DMoneyConstants.VERSION, DMoneyConstants.VERSION_VAL);
 		checkoutParams.put(DMoneyConstants.TRADE_TYPE, DMoneyConstants.CHECKOUT);
@@ -163,14 +168,22 @@ public class DMoneyGateway implements Gateway {
 	}
 
 	private void ensureAccessToken() {
-		if (Optional.ofNullable(accessToken).isEmpty()) {
-			accessToken = fetchAccessToken();
+		if (Optional.ofNullable(accessToken).isEmpty() || isTokenExpired()) {
+			fetchAccessToken();
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private String fetchAccessToken() {
-		String token = null;
+	private boolean isTokenExpired() {
+		if (accessToken == null) {
+			return true;
+		}
+
+		LocalDateTime expirationDate = LocalDateTime.parse(expirationDateStr, DMoneyConstants.DATE_FORMATTER);
+		return LocalDateTime.now().isAfter(expirationDate);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void fetchAccessToken() {
 		try {
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
@@ -183,7 +196,9 @@ public class DMoneyGateway implements Gateway {
 			ResponseEntity<Map> response = restTemplate.postForEntity(dmoneyHost + tokenUrl, request, Map.class);
 
 			if (response.getStatusCode() == HttpStatus.OK) {
-				token = response.getBody().get(DMoneyConstants.TOKEN).toString();
+				Map<String, String> responseMap = response.getBody();
+				accessToken = responseMap.get(DMoneyConstants.TOKEN).toString();
+				expirationDateStr = responseMap.get(DMoneyConstants.EXPIRATION_DATE).toString();
 			} else {
 				throw new CustomException("TOKEN_GEN_ERROR", String.valueOf(response.getBody().get("errorMsg")));
 			}
@@ -191,7 +206,6 @@ public class DMoneyGateway implements Gateway {
 			log.error("D-Money fetching access token failed", e);
 			throw new ServiceCallException("Error occurred while fetching access token from D-Money");
 		}
-		return token;
 	}
 
 	private HttpHeaders createHeaders() {

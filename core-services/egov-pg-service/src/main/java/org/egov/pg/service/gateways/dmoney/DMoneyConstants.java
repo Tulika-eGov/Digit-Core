@@ -1,6 +1,10 @@
 package org.egov.pg.service.gateways.dmoney;
 
+import java.time.format.DateTimeFormatter;
+
 public class DMoneyConstants {
+
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
 	public static final String GATEWAY_NAME = "D-MONEY";
 	public static final String APP_SECRET = "appSecret";
@@ -25,6 +29,7 @@ public class DMoneyConstants {
 	public static final String VERSION = "version";
 	public static final String PAYMENT_ORDER_ID = "payment_order_id";
 	public static final String TOKEN = "token";
+	public static final String EXPIRATION_DATE = "expirationDate";
 	public static final String ORDER_STATUS = "order_status";
 	public static final String LANGUAGE = "language";
 
