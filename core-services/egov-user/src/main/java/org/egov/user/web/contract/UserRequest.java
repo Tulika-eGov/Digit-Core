@@ -59,7 +59,7 @@ public class UserRequest {
     private String altContactNumber;
 
     @SafeHtml
-    @Size(max = 10)
+    @Size(max = 12)
     private String pan;
 
     @SafeHtml
