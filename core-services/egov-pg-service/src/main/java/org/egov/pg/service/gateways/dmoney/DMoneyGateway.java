@@ -25,6 +25,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -94,10 +95,15 @@ public class DMoneyGateway implements Gateway {
 					String.valueOf(orderResponse.getOrDefault("msg", "Unknown error occurred.")));
 		}
 
+		log.info("nonce_str: " + orderResponse.get(DMoneyConstants.NONCE_STR));
+		log.info("prepay_id: " + bizContent.get(DMoneyConstants.PREPAY_ID));
+
 		Map<String, Object> signParams = Map.of(DMoneyConstants.MERCH_APP_ID, appId, DMoneyConstants.NONCE_STR,
 				String.valueOf(orderResponse.get(DMoneyConstants.NONCE_STR)), DMoneyConstants.PREPAY_ID,
 				String.valueOf(bizContent.get(DMoneyConstants.PREPAY_ID)), DMoneyConstants.MERCH_CODE, merchCode,
 				DMoneyConstants.TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
+
+		log.info("Sign parameters of checkout url: " + signParams);
 
 		String sign = DMoneyUtils.generateSignature(signParams, privateKey);
 		Map<String, Object> checkoutParams = new TreeMap<>(signParams);
@@ -109,8 +115,11 @@ public class DMoneyGateway implements Gateway {
 
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		checkoutParams.forEach((key, value) -> params.put(key, List.of(value.toString())));
+		UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(checkoutUrl).queryParams(params).build();
 
-		return UriComponentsBuilder.fromHttpUrl(checkoutUrl).queryParams(params).build().encode().toUri();
+		log.info("Checkout url : " + uriComponents.toString());
+
+		return uriComponents.encode().toUri();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -132,6 +141,9 @@ public class DMoneyGateway implements Gateway {
 
 		HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 		ResponseEntity<Map> response = restTemplate.postForEntity(dmoneyHost + preOrderUrl, request, Map.class);
+
+		log.info("Pre-order response: " + response);
+
 		return response.getBody();
 	}
 
@@ -148,6 +160,8 @@ public class DMoneyGateway implements Gateway {
 
 		HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(requestBody, headers);
 		ResponseEntity<Map> response = restTemplate.postForEntity(dmoneyHost + statusUrl, httpEntity, Map.class);
+
+		log.info("Fetch status response: " + response);
 
 		return transformRawResponse(response.getBody(), currentStatus);
 	}
@@ -178,6 +192,8 @@ public class DMoneyGateway implements Gateway {
 			return true;
 		}
 
+		log.info("Current datetime: " + LocalDateTime.now());
+
 		LocalDateTime expirationDate = LocalDateTime.parse(expirationDateStr, DMoneyConstants.DATE_FORMATTER);
 		return LocalDateTime.now().isAfter(expirationDate);
 	}
@@ -197,8 +213,11 @@ public class DMoneyGateway implements Gateway {
 
 			if (response.getStatusCode() == HttpStatus.OK) {
 				Map<String, String> responseMap = response.getBody();
-				accessToken = responseMap.get(DMoneyConstants.TOKEN).toString();
-				expirationDateStr = responseMap.get(DMoneyConstants.EXPIRATION_DATE).toString();
+				accessToken = responseMap.get(DMoneyConstants.TOKEN);
+				log.info("Access token: " + accessToken);
+
+				expirationDateStr = responseMap.get(DMoneyConstants.EXPIRATION_DATE);
+				log.info("Expiration datetime: " + expirationDateStr);
 			} else {
 				throw new CustomException("TOKEN_GEN_ERROR", String.valueOf(response.getBody().get("errorMsg")));
 			}
@@ -226,6 +245,8 @@ public class DMoneyGateway implements Gateway {
 		Map<String, Object> params = new HashMap<>(requestBody);
 		bizContent.forEach(params::put);
 
+		log.info("Sign parameters: " + bizContent);
+
 		requestBody.put(DMoneyConstants.SIGN, DMoneyUtils.generateSignature(params, privateKey));
 		requestBody.put(DMoneyConstants.SIGN_TYPE, DMoneyConstants.SIGN_ALGORITHM);
 		requestBody.put(DMoneyConstants.BIZ_CONTENT, bizContent);
@@ -240,16 +261,19 @@ public class DMoneyGateway implements Gateway {
 		}
 
 		Map<String, Object> bizContent = (Map<String, Object>) response.get(DMoneyConstants.BIZ_CONTENT);
-		Object orderStatus = bizContent.get(DMoneyConstants.ORDER_STATUS);
-		if (orderStatus == null) {
+		Object orderStatusObj = bizContent.get(DMoneyConstants.ORDER_STATUS);
+		if (orderStatusObj == null) {
 			throw new CustomException("QUERY_ORDER_FAILED",
 					String.valueOf(response.getOrDefault("msg", "Unknown error occurred.")));
 		}
 
+		String orderStatus = String.valueOf(orderStatusObj);
+		log.info("Payment order status: " + orderStatus);
+
 		Transaction.TxnStatusEnum status;
 		String gatewayStatusMsg;
 
-		switch (String.valueOf(orderStatus)) {
+		switch (orderStatus) {
 		case DMoneyConstants.PAY_SUCCESS:
 			status = Transaction.TxnStatusEnum.SUCCESS;
 			gatewayStatusMsg = DMoneyConstants.PAY_SUCCESS;
