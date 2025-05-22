@@ -35,7 +35,7 @@ public class UserRepository {
     @Autowired
     private RestTemplate restTemplate;
 
-    public User fetchUser(String mobileNumber, String tenantId, String userType) {
+    public User fetchUser(String username, String mobileNumber, String tenantId, String userType) {
     	
     	/*
     	 * #central-instance
@@ -45,7 +45,7 @@ public class UserRepository {
     	String tenantIdForHeader = tenantId;
         UserSearchRequest request = null;
         if (userType !=null && userType.equals("EMPLOYEE")) {
-            request = new UserSearchRequest(null, tenantId, userType, mobileNumber);
+            request = new UserSearchRequest(username, tenantId, userType, null);
         } else {
         	tenantIdForHeader = tenantId.split("\\.")[0];
             request = new UserSearchRequest(mobileNumber, tenantIdForHeader, userType, null);
@@ -65,7 +65,7 @@ public class UserRepository {
             List<UserSearchResponseContent> users = (List<UserSearchResponseContent>) response.get("user");
             if (!users.isEmpty()) {
                 UserSearchResponseContent user = mapper.convertValue(users.get(0), UserSearchResponseContent.class);
-                return new User(user.getId(), user.getEmailId(), user.getMobileNumber());
+                return new User(user.getId(), user.getUserName(), user.getMobileNumber());
             } else {
                 return null;
             }

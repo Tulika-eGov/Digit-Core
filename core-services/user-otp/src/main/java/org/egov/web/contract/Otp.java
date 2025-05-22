@@ -14,6 +14,7 @@ public class Otp {
     private static final String USER_REGISTRATION = "register";
     private static final String PASSWORD_RESET = "passwordreset";
     private static final String USER_LOGIN = "login";
+    private String username;
     private String mobileNumber;
     private String tenantId;
     private String type;

@@ -10,10 +10,10 @@ import org.egov.domain.model.User;
 @ToString
 public class UserSearchResponseContent {
     private Long id;
-    private String emailId;
+    private String userName;
     private String mobileNumber;
 
     public User toDomainUser() {
-        return new User(id, emailId, mobileNumber);
+        return new User(id, userName, mobileNumber);
     }
 }

@@ -13,7 +13,8 @@ public class OtpRequest {
     public OtpRequest(org.egov.domain.model.OtpRequest otpRequest) {
         this.otp = Otp.builder()
                 .tenantId(otpRequest.getTenantId())
-                .identity(otpRequest.getMobileNumber())
+                .identity(otpRequest.getUserType().equals("EMPLOYEE") ? otpRequest.getUsername() 
+                		: otpRequest.getMobileNumber())
                 .build();
     }
 }

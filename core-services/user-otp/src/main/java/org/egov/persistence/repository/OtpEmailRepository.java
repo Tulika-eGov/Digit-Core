@@ -74,7 +74,7 @@ public class OtpEmailRepository {
 			locale = otpRequest.getRequestInfo().getMsgId().split("|")[1];
 		}
 		else {
-			locale = "en_IN";
+			locale = "fr_FR_IN";
 		}
 		return locale;
 	}

@@ -42,7 +42,7 @@ public class OtpService {
     }
 
     private void sendOtpForUserRegistration(OtpRequest otpRequest) {
-        final User matchingUser = userRepository.fetchUser(otpRequest.getMobileNumber(), otpRequest.getTenantId(),
+        final User matchingUser = userRepository.fetchUser(otpRequest.getUsername(), otpRequest.getMobileNumber(), otpRequest.getTenantId(),
                 otpRequest.getUserType());
 
         if (otpRequest.isRegistrationRequestType() && null != matchingUser)
@@ -51,8 +51,12 @@ public class OtpService {
             throw new UserNotExistingInSystemException();
 
         final String otpNumber = otpRepository.fetchOtp(otpRequest);
-        otpSMSSender.send(otpRequest, otpNumber);
-        if(!otpRequest.isRegistrationRequestType()) // Because new user doesn't have any email configured
+        boolean isEmployee = otpRequest.getUserType().equals("EMPLOYEE");
+        if (!isEmployee) {
+        	otpSMSSender.send(otpRequest, otpNumber);
+        }
+        
+        if(!otpRequest.isRegistrationRequestType() && isEmployee) // Because new user doesn't have any email configured
             try{
                 otpEmailRepository.send(matchingUser.getEmail(), otpNumber, otpRequest);
             } catch (Exception ignore){
@@ -62,7 +66,7 @@ public class OtpService {
     }
 
     private void sendOtpForPasswordReset(OtpRequest otpRequest) {
-        final User matchingUser = userRepository.fetchUser(otpRequest.getMobileNumber(), otpRequest.getTenantId(),
+        final User matchingUser = userRepository.fetchUser(otpRequest.getUsername(), otpRequest.getMobileNumber(), otpRequest.getTenantId(),
                 otpRequest.getUserType());
         if (null == matchingUser) {
             throw new UserNotFoundException();

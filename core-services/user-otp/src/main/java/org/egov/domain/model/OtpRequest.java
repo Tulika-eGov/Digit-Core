@@ -14,6 +14,7 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 public class OtpRequest {
 
 	private RequestInfo requestInfo;
+	private String username;
 	@Setter
     private String mobileNumber;
     private String tenantId;
@@ -22,12 +23,17 @@ public class OtpRequest {
 
     public void validate() {
         if(isTenantIdAbsent()
-				|| isMobileNumberAbsent()
-				|| isInvalidType()
+        		|| (getUserType().equals("EMPLOYEE") && (isUsernameAbsent() || !isUsernameValid()))
+				|| (!getUserType().equals("EMPLOYEE") && (isMobileNumberAbsent()
 				|| isMobileNumberNumeric()
-				|| isMobileNumberValidLength()) {
+				|| isMobileNumberValidLength()))
+				|| isInvalidType()) {
             throw new InvalidOtpRequestException(this);
         }
+    }
+    
+    public boolean isUsernameValid() {
+    	return !isUsernameAbsent() && getUsername().matches("^(.+)@(\\S+)$");
     }
 
 	public boolean isMobileNumberNumeric() {
@@ -63,5 +69,9 @@ public class OtpRequest {
 
     public boolean isMobileNumberAbsent() {
         return isEmpty(mobileNumber);
+    }
+    
+    public boolean isUsernameAbsent() {
+        return isEmpty(username);
     }
 }
