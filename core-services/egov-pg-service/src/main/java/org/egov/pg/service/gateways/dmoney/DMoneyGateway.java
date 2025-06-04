@@ -53,6 +53,7 @@ public class DMoneyGateway implements Gateway {
 	private final String transCurrency;
 	private final String timeoutExpress;
 	private final String language;
+	private final String referer;
 
 	private final RestTemplate restTemplate;
 	private String accessToken;
@@ -77,6 +78,7 @@ public class DMoneyGateway implements Gateway {
 		transCurrency = environment.getRequiredProperty("dmoney.trans.currency");
 		timeoutExpress = environment.getRequiredProperty("dmoney.timeout.express");
 		language = environment.getRequiredProperty("dmoney.language");
+		referer = environment.getRequiredProperty("dmoney.referer");
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -113,6 +115,7 @@ public class DMoneyGateway implements Gateway {
 		checkoutParams.put(DMoneyConstants.VERSION, DMoneyConstants.VERSION_VAL);
 		checkoutParams.put(DMoneyConstants.TRADE_TYPE, DMoneyConstants.CHECKOUT);
 		checkoutParams.put(DMoneyConstants.LANGUAGE, language);
+		checkoutParams.put(DMoneyConstants.REFERER, referer);
 
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		checkoutParams.forEach((key, value) -> params.put(key, List.of(value.toString())));

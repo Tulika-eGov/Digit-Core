@@ -33,6 +33,7 @@ public class DMoneyConstants {
 	public static final String EXPIRATION_DATE = "expirationDate";
 	public static final String ORDER_STATUS = "order_status";
 	public static final String LANGUAGE = "language";
+	public static final String REFERER = "Referer";
 
 	public static final String PAY_SUCCESS = "PAY_SUCCESS";
 	public static final String PAY_PENDING = "PAY_PENDING";
