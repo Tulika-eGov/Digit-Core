@@ -29,6 +29,7 @@ public class DMoneyConstants {
 	public static final String VERSION = "version";
 	public static final String PAYMENT_ORDER_ID = "payment_order_id";
 	public static final String TOKEN = "token";
+	public static final String EFFECTIVE_DATE = "effectiveDate";
 	public static final String EXPIRATION_DATE = "expirationDate";
 	public static final String ORDER_STATUS = "order_status";
 	public static final String LANGUAGE = "language";

@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.pg.models.Transaction;
 import org.egov.pg.service.Gateway;
 import org.egov.tracer.model.CustomException;
@@ -56,6 +56,7 @@ public class DMoneyGateway implements Gateway {
 
 	private final RestTemplate restTemplate;
 	private String accessToken;
+	private String effectiveDateStr;
 	private String expirationDateStr;
 
 	@Autowired
@@ -182,20 +183,23 @@ public class DMoneyGateway implements Gateway {
 	}
 
 	private void ensureAccessToken() {
-		if (Optional.ofNullable(accessToken).isEmpty() || isTokenExpired()) {
+		if (StringUtils.isBlank(accessToken) || !isTokenActive()) {
 			fetchAccessToken();
 		}
 	}
 
-	private boolean isTokenExpired() {
-		if (accessToken == null) {
-			return true;
+	private boolean isTokenActive() {
+		if (StringUtils.isBlank(accessToken)) {
+			return false;
 		}
 
-		log.info("Current datetime: " + LocalDateTime.now());
+		LocalDateTime now = LocalDateTime.now();
+		log.info("Current datetime: " + now);
 
+		LocalDateTime effectiveDate = LocalDateTime.parse(effectiveDateStr, DMoneyConstants.DATE_FORMATTER);
 		LocalDateTime expirationDate = LocalDateTime.parse(expirationDateStr, DMoneyConstants.DATE_FORMATTER);
-		return LocalDateTime.now().isAfter(expirationDate);
+
+		return (now.isEqual(effectiveDate) || now.isAfter(effectiveDate)) && now.isBefore(expirationDate);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -215,6 +219,9 @@ public class DMoneyGateway implements Gateway {
 				Map<String, String> responseMap = response.getBody();
 				accessToken = responseMap.get(DMoneyConstants.TOKEN);
 				log.info("Access token: " + accessToken);
+
+				effectiveDateStr = responseMap.get(DMoneyConstants.EFFECTIVE_DATE);
+				log.info("Effective datetime: " + effectiveDateStr);
 
 				expirationDateStr = responseMap.get(DMoneyConstants.EXPIRATION_DATE);
 				log.info("Expiration datetime: " + expirationDateStr);
