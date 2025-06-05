@@ -145,7 +145,7 @@ class EscalationUtilTest {
         BusinessService businessService = new BusinessService();
         ArrayList<Action> actions = new ArrayList<>();
         businessService.addStatesItem(new State("01234567-89AB-CDEF-FEDC-BA9876543210", "42", "42", 1L, "MD",
-                "STATUS_NOT_FOUND", true, true, true, true, actions, new AuditDetails()));
+                "STATUS_NOT_FOUND", true, true, true, true, null, actions, new AuditDetails()));
 
         ArrayList<BusinessService> businessServiceList = new ArrayList<>();
         businessServiceList.add(businessService);
