@@ -70,6 +70,9 @@ public class State   {
 
         @JsonProperty("isStateUpdatable")
         private Boolean isStateUpdatable;
+        
+        @JsonProperty("triggerParallelWorkflows")
+        private List<String> triggerParallelWorkflows;
 
         @JsonProperty("actions")
         @Valid
