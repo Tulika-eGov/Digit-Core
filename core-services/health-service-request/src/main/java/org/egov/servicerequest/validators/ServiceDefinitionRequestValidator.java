@@ -31,7 +31,7 @@ public class ServiceDefinitionRequestValidator {
         ServiceDefinition serviceDefinition = serviceDefinitionRequest.getServiceDefinition();
 
         // Validate if a service definition with the same combination of tenantId and code already exists
-        validateServiceDefinitionExistence(serviceDefinition);
+//        validateServiceDefinitionExistence(serviceDefinition);
 
         // Validate if all attribute definitions provided as part of service definitions have unique code
         validateAttributeDefinitionUniqueness(serviceDefinition);
