@@ -59,10 +59,23 @@ public class OtpSMSRepository {
         final String messageFormat = getMessageFormat(otpRequest);
         return format(messageFormat, otpNumber);
     }
+    
+    private String getLocale(OtpRequest otpRequest){
+		String locale;
+		if(otpRequest.getRequestInfo() != null && otpRequest.getRequestInfo().getMsgId() != null && otpRequest.getRequestInfo().getMsgId().contains("|"))
+		{
+			locale = otpRequest.getRequestInfo().getMsgId().split("|")[1];
+		}
+		else {
+			locale = "fr_FR_IN";
+		}
+		return locale;
+	}
 
     private String getMessageFormat(OtpRequest otpRequest) {
         String tenantId = getRequiredTenantId(otpRequest.getTenantId());
-        Map<String, String> localisedMsgs = localizationService.getLocalisedMessages(tenantId, "en_IN", "egov-user");
+        String locale = getLocale(otpRequest);
+        Map<String, String> localisedMsgs = localizationService.getLocalisedMessages(tenantId, locale, "egov-user");
         if (localisedMsgs.isEmpty()) {
             log.info("Localization Service didn't return any msgs so using default...");
             localisedMsgs.put(LOCALIZATION_KEY_REGISTER_SMS, "Dear Citizen, Your OTP to complete your mSeva Registration is %s.");
