@@ -79,38 +79,45 @@ public class MinioRepository implements CloudFilesManager {
 	
 
 	private void push(MultipartFile multipartFile, String fileNameWithPath) {
-		try {
-			InputStream is = multipartFile.getInputStream();
-			long contentLength = multipartFile.getSize();
-
-			/*PutObjectOptions putObjectOptions = new PutObjectOptions(contentLength, PutObjectOptions.MAX_PART_SIZE);
-			putObjectOptions.setContentType(multipartFile.getContentType());
-			minioClient.putObject(minioConfig.getBucketName(), fileNameWithPath, is, putObjectOptions);*/
-
-			long fileSize = is.available();
-			PutObjectArgs.Builder putObjectArgsBuilder = PutObjectArgs.builder()
-					.bucket(minioConfig.getBucketName())
-					.object(fileNameWithPath)
-					.stream(is, fileSize, -1) // Set part size to -1 for auto detection
-					.contentType(multipartFile.getContentType()); // Change this as per your file's content type
-
-			// If the file is larger than 5 MB, set the part size explicitly (5 * 1024 * 1024 bytes)
-			/*if (fileSize > 5 * 1024 * 1024) {
-				putObjectArgsBuilder.  .partSize(5 * 1024 * 1024);
-			}*/
-
-			minioClient.putObject(putObjectArgsBuilder.build());
-
-
-
-			log.debug("Upload Successful");
-
-		} catch (MinioException | InvalidKeyException | IllegalArgumentException | NoSuchAlgorithmException
-				| IOException e) {
-			log.error("Error occurred: ", e);
-			throw new RuntimeException(ERROR_IN_CONFIGURATION);
+		int maxRetries = 3;
+		while (maxRetries-- > 0) {
+			try(InputStream is = multipartFile.getInputStream()) {	
+				long contentLength = multipartFile.getSize();
+	
+				/*PutObjectOptions putObjectOptions = new PutObjectOptions(contentLength, PutObjectOptions.MAX_PART_SIZE);
+				putObjectOptions.setContentType(multipartFile.getContentType());
+				minioClient.putObject(minioConfig.getBucketName(), fileNameWithPath, is, putObjectOptions);*/
+	
+				PutObjectArgs.Builder putObjectArgsBuilder = PutObjectArgs.builder()
+						.bucket(minioConfig.getBucketName())
+						.object(fileNameWithPath)
+						.stream(is, contentLength, -1) // Set part size to -1 for auto detection
+						.contentType(multipartFile.getContentType()); // Change this as per your file's content type
+	
+				// If the file is larger than 5 MB, set the part size explicitly (5 * 1024 * 1024 bytes)
+				/*if (fileSize > 5 * 1024 * 1024) {
+					putObjectArgsBuilder.  .partSize(5 * 1024 * 1024);
+				}*/
+	
+				minioClient.putObject(putObjectArgsBuilder.build());
+	
+				log.debug("Upload Successful");
+				return;
+	
+			} catch (MinioException | InvalidKeyException | IllegalArgumentException | NoSuchAlgorithmException
+					| IOException e) {
+				log.error("Upload failed for file: {}, error: {}", fileNameWithPath, e.getMessage(), e);
+				if (maxRetries == 0) {
+					throw new RuntimeException(ERROR_IN_CONFIGURATION + " : " + e.getClass().getSimpleName() + " - " + e.getMessage(), e);
+				}
+				try {
+				    Thread.sleep(1000);
+				} catch (InterruptedException ie) {
+				    Thread.currentThread().interrupt(); // Restore interrupt status
+				    throw new RuntimeException("Upload retry interrupted", ie);
+				}
+			}	
 		}
-
 	}
 
 	private void push(InputStream is, long contentLength, String contentType, String fileNameWithPath) {
