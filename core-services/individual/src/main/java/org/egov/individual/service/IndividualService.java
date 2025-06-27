@@ -56,6 +56,8 @@ import static org.egov.common.utils.CommonUtils.notHavingErrors;
 import static org.egov.common.utils.CommonUtils.populateErrorDetails;
 import static org.egov.individual.Constants.SET_INDIVIDUALS;
 import static org.egov.individual.Constants.VALIDATION_ERROR;
+import org.egov.common.contract.request.User;
+
 
 @Service
 @Slf4j
@@ -413,14 +415,26 @@ public class IndividualService {
                                 individual.getName());
                     } else if (apiOperation.equals(ApiOperation.CREATE)) {
                         if (Boolean.TRUE.equals(individual.getIsSystemUser())) {
-                        List<UserRequest> userRequests = userIntegrationService.createUser(individual,
-                                request.getRequestInfo());
-                            individual.setUserId(Long.toString(userRequests.get(0).getId()));
-                            individualList.get(0).setUserUuid(userRequests.get(0).getUuid());
+                            String userId = null;
+                            String userUuid = null;
+                            List<User> existingUsers = userIntegrationService.searchUser(individual);
+                            if (existingUsers.isEmpty()) {
+                                List<UserRequest> userRequests = userIntegrationService.createUser(individual,
+                                        request.getRequestInfo());
+                                log.info("successfully created user for {} ",
+                                        individual.getName());
+                                userId = Long.toString(userRequests.get(0).getId());
+                                userUuid = userRequests.get(0).getUuid();
+                            } else {
+                                log.info("successfully searched user for {} ",
+                                        existingUsers.get(0).getUserName());
+                                userId = Long.toString(existingUsers.get(0).getId());
+                                userUuid = existingUsers.get(0).getUuid();
+                            }
+                            individual.setUserId(userId);
+                            individualList.get(0).setUserUuid(userUuid);
                         }
-                        log.info("successfully created user for {} ",
-                                individual.getName());
-                    } else {
+                    }else {
                         userIntegrationService.deleteUser(Collections.singletonList(individual),
                                 request.getRequestInfo());
                         log.info("successfully soft deleted user for {} ",
