@@ -5,6 +5,8 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.models.individual.Individual;
 import org.egov.common.models.user.CreateUserRequest;
 import org.egov.common.models.user.UserRequest;
+import org.egov.common.contract.request.User;
+import org.egov.common.contract.user.UserSearchRequest;
 import org.egov.common.service.UserService;
 import org.egov.individual.config.IndividualProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,5 +61,17 @@ public class UserIntegrationService {
         return individual -> IndividualMapper
                 .toUserRequest(individual,
                         individualProperties);
+    }
+
+    public List<User> searchUser(Individual validIndividual,
+                                 RequestInfo requestInfo) {
+        log.info("integrating with user service");
+        UserRequest userRequest = IndividualMapper.toUserRequest(validIndividual, individualProperties);
+
+        UserSearchRequest userSearchCriteria = new UserSearchRequest();
+
+        userSearchCriteria.setTenantId(userRequest.getTenantId());
+        userSearchCriteria.setUserName(userRequest.getUserName());
+        return userService.search(userSearchCriteria);
     }
 }
