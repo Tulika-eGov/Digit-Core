@@ -63,8 +63,7 @@ public class UserIntegrationService {
                         individualProperties);
     }
 
-    public List<User> searchUser(Individual validIndividual,
-                                 RequestInfo requestInfo) {
+    public List<User> searchUser(Individual validIndividual) {
         log.info("integrating with user service");
         UserRequest userRequest = IndividualMapper.toUserRequest(validIndividual, individualProperties);
 

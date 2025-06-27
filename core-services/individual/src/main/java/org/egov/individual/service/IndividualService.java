@@ -417,8 +417,7 @@ public class IndividualService {
                         if (Boolean.TRUE.equals(individual.getIsSystemUser())) {
                             String userId = null;
                             String userUuid = null;
-                            List<User> existingUsers = userIntegrationService.searchUser(individual,
-                                    request.getRequestInfo());
+                            List<User> existingUsers = userIntegrationService.searchUser(individual);
                             if (existingUsers.isEmpty()) {
                                 List<UserRequest> userRequests = userIntegrationService.createUser(individual,
                                         request.getRequestInfo());
