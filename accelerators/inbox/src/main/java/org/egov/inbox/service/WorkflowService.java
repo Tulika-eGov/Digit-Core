@@ -125,6 +125,7 @@ public class WorkflowService {
                     Map<String, Object> statusRequest = new HashMap<>();
                     statusRequest.put("RequestInfo", requestInfo);
                     statusRequest.put("ProcessInstanceSearchCriteria", criteria);
+		    url.append("?tenantId=").append(criteria.getTenantId());
                     finalResponse = (List<HashMap<String, Object>>) serviceRequestRepository.fetchListResult(url, statusRequest);
                     criteria.setBusinessService(inputBusinessSrvs);
                 } else {
@@ -229,6 +230,20 @@ public class WorkflowService {
 		});
 
 		return statusIdToApplicationStatusMap;
+	}
+
+	public Map<String,String> getApplicationStatusIdToStateMap(List<BusinessService> businessServices){
+
+		Map<String,String> statusIdToApplicationStateMap = new HashMap<>();
+
+		businessServices.forEach(businessService -> {
+			businessService.getStates().forEach(state -> {
+				statusIdToApplicationStateMap.put(state.getUuid(), state.getState());
+					}
+			);
+		});
+
+		return statusIdToApplicationStateMap;
 	}
 
 	

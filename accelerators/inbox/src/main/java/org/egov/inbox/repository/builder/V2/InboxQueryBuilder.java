@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.inbox.util.ErrorConstants;
 import org.egov.inbox.util.MDMSUtil;
 import org.egov.inbox.web.model.InboxRequest;
@@ -76,7 +77,7 @@ public class InboxQueryBuilder implements QueryBuilderInterface {
         });
 
         addModuleSearchCriteriaToBaseQuery(params, nameToPathMap, nameToOperator, mustClauseList);
-        addProcessSearchCriteriaToBaseQuery(inboxRequest.getInbox().getProcessSearchCriteria(), nameToPathMap, nameToOperator, mustClauseList);
+        addProcessSearchCriteriaToBaseQuery(inboxRequest, nameToPathMap, nameToOperator, mustClauseList);
 
         innerBoolClause.put(MUST_KEY, mustClauseList);
 
@@ -133,8 +134,15 @@ public class InboxQueryBuilder implements QueryBuilderInterface {
         baseEsQuery.put(SORT_KEY, sortClause);
     }
 
-    private void addProcessSearchCriteriaToBaseQuery(ProcessInstanceSearchCriteria processSearchCriteria, Map<String, String> nameToPathMap, Map<String, SearchParam.Operator> nameToOperator, List<Object> mustClauseList) {
-        if(!ObjectUtils.isEmpty(processSearchCriteria.getTenantId())){
+    private void addProcessSearchCriteriaToBaseQuery(InboxRequest inboxRequest, Map<String, String> nameToPathMap, Map<String, SearchParam.Operator> nameToOperator, List<Object> mustClauseList) {
+        ProcessInstanceSearchCriteria processSearchCriteria = inboxRequest.getInbox().getProcessSearchCriteria();
+    	
+        RequestInfo requestInfo = inboxRequest.getRequestInfo();
+        if (requestInfo != null && requestInfo.getUserInfo() != null) {
+        	processSearchCriteria.setAssignee(requestInfo.getUserInfo().getUuid());
+        }
+        
+    	if(!ObjectUtils.isEmpty(processSearchCriteria.getTenantId())){
             String key = "tenantId";
             Map<String, Object> mustClauseChild = null;
             Map<String, Object> params = new HashMap<>();

@@ -415,7 +415,7 @@ public class InboxService {
 //                    if(output.size()==0){
 //                        throw new CustomException("NO_DATA", "No logs data for the given user with the provided search criteria");
 //                    }
-                    totalCount = responseNode.get(ELASTICSEARCH_HIT_KEY).get("total").intValue();
+                    totalCount = responseNode.get(ELASTICSEARCH_HIT_KEY).get("total").get("value").intValue();
 
                     List<String> userIds = new ArrayList<>();
                     if (!isNull(output) && output.isArray()) {
@@ -825,7 +825,10 @@ public class InboxService {
 			
 			statusCountMap=	aggregateStatusCountMap;
 			//log.info("removeStatusCountMap:: "+ new Gson().toJson(statusCountMap));
-
+			 if(moduleSearchCriteria.containsKey("mobileNumber") || moduleSearchCriteria.containsKey("applicationNos"))
+	            {
+	                totalCount = inboxes.size();
+	            }
 		}
 		log.info("statusCountMap size :::: " + statusCountMap.size());
 		
