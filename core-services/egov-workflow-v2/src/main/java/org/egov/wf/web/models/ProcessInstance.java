@@ -109,6 +109,8 @@ public class ProcessInstance   {
         @JsonProperty("escalated")
         private Boolean escalated = false;
 
+        @JsonProperty("triggerSelectiveParallelWorkflows")
+        private List<String> triggerSelectiveParallelWorkflows = null;
 
         public ProcessInstance addDocumentsItem(Document documentsItem) {
             if (this.documents == null) {

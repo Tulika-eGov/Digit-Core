@@ -50,8 +50,15 @@ public class StatusUpdateService {
 				processStateAndAction.getProcessInstanceFromRequest().setPreviousStatus(prevStatus);
 			}
 			processStateAndAction.getProcessInstanceFromRequest().setState(processStateAndAction.getResultantState());
-			if (!CollectionUtils.isEmpty(processStateAndAction.getResultantState().getTriggerParallelWorkflows())) {
-				triggerParallelWorkflows(requestInfo, processStateAndAction, processStateAndAction.getResultantState().getTriggerParallelWorkflows());
+			
+			// Check if selective parallel workflows are specified
+			List<String> workflowsToTrigger = getWorkflowsToTrigger(
+				processStateAndAction.getProcessInstanceFromRequest(), 
+				processStateAndAction.getResultantState()
+			);
+			
+			if (!CollectionUtils.isEmpty(workflowsToTrigger)) {
+				triggerParallelWorkflows(requestInfo, processStateAndAction, workflowsToTrigger);
 			}
 		}
 		List<ProcessInstance> processInstances = new LinkedList<>();
@@ -60,6 +67,36 @@ public class StatusUpdateService {
 		});
 		ProcessInstanceRequest processInstanceRequest = new ProcessInstanceRequest(requestInfo, processInstances);
 		producer.push(processInstances.get(0).getTenantId(), config.getSaveTransitionTopic(), processInstanceRequest);
+	}
+
+	/**
+	 * Determines which workflows to trigger based on selective workflows (if provided) or all configured workflows
+	 * @param processInstance The process instance from the request
+	 * @param resultantState The state resulting from the transition
+	 * @return List of workflow business services to trigger
+	 */
+	private List<String> getWorkflowsToTrigger(ProcessInstance processInstance, State resultantState) {
+		List<String> configuredWorkflows = resultantState.getTriggerParallelWorkflows();
+		List<String> selectiveWorkflows = processInstance.getTriggerSelectiveParallelWorkflows();
+		
+		// If no workflows are configured, return empty list
+		if (CollectionUtils.isEmpty(configuredWorkflows)) {
+			return Collections.emptyList();
+		}
+		
+		// If selective workflows are provided, use intersection of configured and selective
+		if (!CollectionUtils.isEmpty(selectiveWorkflows)) {
+			List<String> workflowsToTrigger = new LinkedList<>();
+			for (String selectiveWorkflow : selectiveWorkflows) {
+				if (configuredWorkflows.contains(selectiveWorkflow)) {
+					workflowsToTrigger.add(selectiveWorkflow);
+				}
+			}
+			return workflowsToTrigger;
+		}
+		
+		// If no selective workflows specified, use all configured workflows
+		return configuredWorkflows;
 	}
 
 	private void triggerParallelWorkflows(RequestInfo requestInfo, ProcessStateAndAction processStateAndAction, List<String> parallelWorkflows) {
