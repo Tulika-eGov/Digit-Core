@@ -1,5 +1,6 @@
 package org.egov.wf.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wf.config.WorkflowConfig;
@@ -77,7 +78,7 @@ public class StatusUpdateService {
 	 */
 	private List<String> getWorkflowsToTrigger(ProcessInstance processInstance, State resultantState) {
 		List<String> configuredWorkflows = resultantState.getTriggerParallelWorkflows();
-		List<String> selectiveWorkflows = processInstance.getTriggerSelectiveParallelWorkflows();
+		String selectiveWorkflows = processInstance.getTriggerSelectiveParallelWorkflows();
 		
 		// If no workflows are configured, return empty list
 		if (CollectionUtils.isEmpty(configuredWorkflows)) {
@@ -85,9 +86,10 @@ public class StatusUpdateService {
 		}
 		
 		// If selective workflows are provided, use intersection of configured and selective
-		if (!CollectionUtils.isEmpty(selectiveWorkflows)) {
+		if (!StringUtils.isEmpty(selectiveWorkflows)) {
 			List<String> workflowsToTrigger = new LinkedList<>();
-			for (String selectiveWorkflow : selectiveWorkflows) {
+			String[] selectiveWorkflowsArr = selectiveWorkflows.split(",");
+			for (String selectiveWorkflow : selectiveWorkflowsArr) {
 				if (configuredWorkflows.contains(selectiveWorkflow)) {
 					workflowsToTrigger.add(selectiveWorkflow);
 				}
