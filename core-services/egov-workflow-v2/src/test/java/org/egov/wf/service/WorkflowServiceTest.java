@@ -81,17 +81,17 @@ class WorkflowServiceTest {
     void testTransition() {
         doNothing().when(this.workflowValidator)
                 .validateRequest((org.egov.common.contract.request.RequestInfo) any(), (List<ProcessStateAndAction>) any());
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(new ArrayList<>());
         doNothing().when(this.statusUpdateService)
                 .updateStatus((org.egov.common.contract.request.RequestInfo) any(), (List<ProcessStateAndAction>) any());
         doNothing().when(this.enrichmentService)
                 .enrichProcessRequest((org.egov.common.contract.request.RequestInfo) any(),
                         (List<ProcessStateAndAction>) any());
-        assertNull(this.workflowService.transition(new ProcessInstanceRequest()));
+        assertNull(this.workflowService.transition(new ProcessInstanceRequest(), false));
         verify(this.workflowValidator).validateRequest((org.egov.common.contract.request.RequestInfo) any(),
                 (List<ProcessStateAndAction>) any());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(this.statusUpdateService).updateStatus((org.egov.common.contract.request.RequestInfo) any(),
                 (List<ProcessStateAndAction>) any());
         verify(this.enrichmentService).enrichProcessRequest((org.egov.common.contract.request.RequestInfo) any(),
@@ -103,15 +103,15 @@ class WorkflowServiceTest {
     void testTransitionWithErrorCode() {
         doNothing().when(this.workflowValidator)
                 .validateRequest((org.egov.common.contract.request.RequestInfo) any(), (List<ProcessStateAndAction>) any());
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(new ArrayList<>());
         doNothing().when(this.statusUpdateService)
                 .updateStatus((org.egov.common.contract.request.RequestInfo) any(), (List<ProcessStateAndAction>) any());
         doThrow(new CustomException("Code", "An error occurred")).when(this.enrichmentService)
                 .enrichProcessRequest((org.egov.common.contract.request.RequestInfo) any(),
                         (List<ProcessStateAndAction>) any());
-        assertThrows(CustomException.class, () -> this.workflowService.transition(new ProcessInstanceRequest()));
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        assertThrows(CustomException.class, () -> this.workflowService.transition(new ProcessInstanceRequest(), false ));
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(this.enrichmentService).enrichProcessRequest((org.egov.common.contract.request.RequestInfo) any(),
                 (List<ProcessStateAndAction>) any());
     }
@@ -121,17 +121,17 @@ class WorkflowServiceTest {
     void testTransitions() {
         doNothing().when(this.workflowValidator)
                 .validateRequest((org.egov.common.contract.request.RequestInfo) any(), (List<ProcessStateAndAction>) any());
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(new ArrayList<>());
         doThrow(new CustomException("Code", "An error occurred")).when(this.statusUpdateService)
                 .updateStatus((org.egov.common.contract.request.RequestInfo) any(), (List<ProcessStateAndAction>) any());
         doNothing().when(this.enrichmentService)
                 .enrichProcessRequest((org.egov.common.contract.request.RequestInfo) any(),
                         (List<ProcessStateAndAction>) any());
-        assertThrows(CustomException.class, () -> this.workflowService.transition(new ProcessInstanceRequest()));
+        assertThrows(CustomException.class, () -> this.workflowService.transition(new ProcessInstanceRequest(), false));
         verify(this.workflowValidator).validateRequest((org.egov.common.contract.request.RequestInfo) any(),
                 (List<ProcessStateAndAction>) any());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(this.statusUpdateService).updateStatus((org.egov.common.contract.request.RequestInfo) any(),
                 (List<ProcessStateAndAction>) any());
         verify(this.enrichmentService).enrichProcessRequest((org.egov.common.contract.request.RequestInfo) any(),

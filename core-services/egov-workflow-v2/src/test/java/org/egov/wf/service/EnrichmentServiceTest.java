@@ -788,7 +788,7 @@ class EnrichmentServiceTest {
 
     @Test
     void testEnrichNextActionForSearchAddProcessInstance() {
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(new ArrayList<>());
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -796,7 +796,7 @@ class EnrichmentServiceTest {
         ArrayList<ProcessInstance> processInstanceList = new ArrayList<>();
         processInstanceList.add(new ProcessInstance());
         assertTrue(this.enrichmentService.enrichNextActionForSearch(requestInfo, processInstanceList).isEmpty());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(requestInfo).getUserInfo();
     }
     @Test
@@ -810,7 +810,7 @@ class EnrichmentServiceTest {
 
         ArrayList<ProcessStateAndAction> processStateAndActionList = new ArrayList<>();
         processStateAndActionList.add(processStateAndAction);
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(processStateAndActionList);
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -818,13 +818,13 @@ class EnrichmentServiceTest {
         ArrayList<ProcessInstance> processInstanceList = new ArrayList<>();
         processInstanceList.add(new ProcessInstance());
         assertEquals(1, this.enrichmentService.enrichNextActionForSearch(requestInfo, processInstanceList).size());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(requestInfo).getUserInfo();
     }
 
     @Test
     void testEnrichNextActionForSearchWithUser() {
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(new ArrayList<>());
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -833,14 +833,14 @@ class EnrichmentServiceTest {
         processInstanceList.add(new ProcessInstance());
         processInstanceList.add(new ProcessInstance());
         assertTrue(this.enrichmentService.enrichNextActionForSearch(requestInfo, processInstanceList).isEmpty());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(requestInfo).getUserInfo();
     }
 
     @Test
     void testEnrichNextActionForSearchWithNull() {
 
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(new ArrayList<>());
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -852,7 +852,7 @@ class EnrichmentServiceTest {
 
     @Test
     void testEnrichNextActionForSearchWithCodeNull() {
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenThrow(new CustomException("Code", "An error occurred"));
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -860,7 +860,7 @@ class EnrichmentServiceTest {
         ArrayList<ProcessInstance> processInstanceList = new ArrayList<>();
         processInstanceList.add(new ProcessInstance());
         assertTrue(this.enrichmentService.enrichNextActionForSearch(requestInfo, processInstanceList).isEmpty());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(requestInfo).getUserInfo();
     }
     @Test
@@ -882,7 +882,7 @@ class EnrichmentServiceTest {
         ArrayList<ProcessStateAndAction> processStateAndActionList = new ArrayList<>();
         processStateAndActionList.add(processStateAndAction1);
         processStateAndActionList.add(processStateAndAction);
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(processStateAndActionList);
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -890,7 +890,7 @@ class EnrichmentServiceTest {
         ArrayList<ProcessInstance> processInstanceList = new ArrayList<>();
         processInstanceList.add(new ProcessInstance());
         assertEquals(2, this.enrichmentService.enrichNextActionForSearch(requestInfo, processInstanceList).size());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(requestInfo).getUserInfo();
     }
 
@@ -911,7 +911,7 @@ class EnrichmentServiceTest {
         processStateAndAction.setResultantState(new State());
         ArrayList<ProcessStateAndAction> processStateAndActionList = new ArrayList<>();
         processStateAndActionList.add(processStateAndAction);
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(processStateAndActionList);
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -919,7 +919,7 @@ class EnrichmentServiceTest {
         processInstanceList.add(new ProcessInstance());
         assertThrows(CustomException.class,
                 () -> this.enrichmentService.enrichNextActionForSearch(requestInfo, processInstanceList));
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(processStateAndAction).getProcessInstanceFromRequest();
         verify(processStateAndAction).getCurrentState();
         verify(processStateAndAction).setAction((Action) any());
@@ -947,7 +947,7 @@ class EnrichmentServiceTest {
 
         ArrayList<ProcessStateAndAction> processStateAndActionList = new ArrayList<>();
         processStateAndActionList.add(processStateAndAction);
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(processStateAndActionList);
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -977,7 +977,7 @@ class EnrichmentServiceTest {
         processStateAndAction.setResultantState(new State());
         ArrayList<ProcessStateAndAction> processStateAndActionList = new ArrayList<>();
         processStateAndActionList.add(processStateAndAction);
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(processStateAndActionList);
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -987,7 +987,7 @@ class EnrichmentServiceTest {
         assertEquals(1, this.enrichmentService.enrichNextActionForSearch(requestInfo, processInstanceList).size());
         verify(this.workflowUtil).isRoleAvailable((String) any(), (List<org.egov.common.contract.request.Role>) any(),
                 (List<String>) any());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(processStateAndAction, atLeast(1)).getProcessInstanceFromRequest();
         verify(processStateAndAction).getCurrentState();
         verify(processStateAndAction).setAction((Action) any());
@@ -1020,7 +1020,7 @@ class EnrichmentServiceTest {
 
         ArrayList<ProcessStateAndAction> processStateAndActionList = new ArrayList<>();
         processStateAndActionList.add(processStateAndAction);
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(processStateAndActionList);
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -1030,7 +1030,7 @@ class EnrichmentServiceTest {
         assertEquals(1, this.enrichmentService.enrichNextActionForSearch(requestInfo, processInstanceList).size());
         verify(this.workflowUtil).isRoleAvailable((String) any(), (List<org.egov.common.contract.request.Role>) any(),
                 (List<String>) any());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(processStateAndAction, atLeast(1)).getProcessInstanceFromRequest();
         verify(processStateAndAction).getCurrentState();
         verify(processStateAndAction).setAction((Action) any());
@@ -1065,7 +1065,7 @@ class EnrichmentServiceTest {
 
         ArrayList<ProcessStateAndAction> processStateAndActionList = new ArrayList<>();
         processStateAndActionList.add(processStateAndAction);
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(processStateAndActionList);
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());
@@ -1075,7 +1075,7 @@ class EnrichmentServiceTest {
         assertEquals(1, this.enrichmentService.enrichNextActionForSearch(requestInfo, processInstanceList).size());
         verify(this.workflowUtil, atLeast(1)).isRoleAvailable((String) any(),
                 (List<org.egov.common.contract.request.Role>) any(), (List<String>) any());
-        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any());
+        verify(this.transitionService).getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false);
         verify(processStateAndAction, atLeast(1)).getProcessInstanceFromRequest();
         verify(processStateAndAction).getCurrentState();
         verify(processStateAndAction).setAction((Action) any());
@@ -1109,7 +1109,7 @@ class EnrichmentServiceTest {
 
         ArrayList<ProcessStateAndAction> processStateAndActionList = new ArrayList<>();
         processStateAndActionList.add(processStateAndAction);
-        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any()))
+        when(this.transitionService.getProcessStateAndActions((List<ProcessInstance>) any(), (Boolean) any(), false))
                 .thenReturn(processStateAndActionList);
         RequestInfo requestInfo = mock(RequestInfo.class);
         when(requestInfo.getUserInfo()).thenReturn(new User());

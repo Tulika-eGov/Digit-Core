@@ -46,7 +46,7 @@ class WorkflowControllerTest {
 
     @Test
     void testProcessTransition() throws Exception {
-        when(this.workflowService.transition((ProcessInstanceRequest) any())).thenReturn(new ArrayList<>());
+        when(this.workflowService.transition((ProcessInstanceRequest) any(), false)).thenReturn(new ArrayList<>());
         when(this.responseInfoFactory.createResponseInfoFromRequestInfo((RequestInfo) any(), (Boolean) any()))
                 .thenReturn(new ResponseInfo());
 

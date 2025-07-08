@@ -53,7 +53,7 @@ public class WorkflowController {
 
         @RequestMapping(value="/process/_transition", method = RequestMethod.POST)
         public ResponseEntity<ProcessInstanceResponse> processTransition(@Valid @RequestBody ProcessInstanceRequest processInstanceRequest) {
-                List<ProcessInstance> processInstances =  workflowService.transition(processInstanceRequest);
+                List<ProcessInstance> processInstances =  workflowService.transition(processInstanceRequest, false);
                 ProcessInstanceResponse response = ProcessInstanceResponse.builder().processInstances(processInstances)
                         .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(processInstanceRequest.getRequestInfo(), true))
                         .build();

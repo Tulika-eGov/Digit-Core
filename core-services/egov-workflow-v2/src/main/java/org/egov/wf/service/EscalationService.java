@@ -98,7 +98,7 @@ public class EscalationService {
                 Integer end = ((i + batchSize) < numberOfBusinessIds ? (i + batchSize) : numberOfBusinessIds) ;
 
                 List<ProcessInstance> processInstances = escalationUtil.getProcessInstances(tenantId, businessIds.subList(start,end), escalation);
-                processInstances = workflowService.transition(new ProcessInstanceRequest(requestInfo, processInstances));
+                processInstances = workflowService.transition(new ProcessInstanceRequest(requestInfo, processInstances), false);
                 producer.push(processInstances.get(0).getTenantId(), escalation.getTopic(),new ProcessInstanceRequest(requestInfo, processInstances));
 
             }

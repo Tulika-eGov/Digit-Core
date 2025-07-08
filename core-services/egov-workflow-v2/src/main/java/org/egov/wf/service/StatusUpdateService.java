@@ -120,7 +120,7 @@ public class StatusUpdateService {
 		List<ProcessInstance> processInstances = new LinkedList<>();
 		processInstances.add(processInstance);
 		ProcessInstanceRequest processInstanceRequest = new ProcessInstanceRequest(requestInfo, processInstances);
-		workflowService.transition(processInstanceRequest);
+		workflowService.transition(processInstanceRequest, true);
 	}
 
 	private List<Action> getParallelWorkflowAction(String tenantId, String businessServiceCode) {

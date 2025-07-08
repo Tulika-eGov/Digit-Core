@@ -67,10 +67,10 @@ public class WorkflowService {
      * @param request The incoming request for workflow transition
      * @return The list of processInstanceFromRequest objects after taking action
      */
-    public List<ProcessInstance> transition(ProcessInstanceRequest request){
+    public List<ProcessInstance> transition(ProcessInstanceRequest request, boolean isInit){
         RequestInfo requestInfo = request.getRequestInfo();
 
-        List<ProcessStateAndAction> processStateAndActions = transitionService.getProcessStateAndActions(request.getProcessInstances(),true);
+        List<ProcessStateAndAction> processStateAndActions = transitionService.getProcessStateAndActions(request.getProcessInstances(),true, isInit);
         enrichmentService.enrichProcessRequest(requestInfo,processStateAndActions);
         workflowValidator.validateRequest(requestInfo,processStateAndActions);
         statusUpdateService.updateStatus(requestInfo,processStateAndActions);

@@ -55,7 +55,7 @@ class TransitionServiceTest {
         ArrayList<ProcessInstance> processInstanceList = new ArrayList<>();
         processInstanceList.add(new ProcessInstance());
         assertThrows(CustomException.class,
-                () -> this.transitionService.getProcessStateAndActions(processInstanceList, true));
+                () -> this.transitionService.getProcessStateAndActions(processInstanceList, true, false));
         verify(this.businessServiceRepository)
                 .getBusinessServices((org.egov.wf.web.models.BusinessServiceSearchCriteria) any());
     }
@@ -96,7 +96,7 @@ class TransitionServiceTest {
         ArrayList<ProcessInstance> processInstanceList = new ArrayList<>();
         processInstanceList.add(new ProcessInstance());
         assertThrows(CustomException.class,
-                () -> this.transitionService.getProcessStateAndActions(processInstanceList, true));
+                () -> this.transitionService.getProcessStateAndActions(processInstanceList, true, false));
         verify(this.worKflowRepository).getProcessInstances((org.egov.wf.web.models.ProcessInstanceSearchCriteria) any());
         verify(this.businessServiceRepository)
                 .getBusinessServices((org.egov.wf.web.models.BusinessServiceSearchCriteria) any());
@@ -142,7 +142,7 @@ class TransitionServiceTest {
         ArrayList<ProcessInstance> processInstanceList = new ArrayList<>();
         processInstanceList.add(new ProcessInstance());
         assertThrows(CustomException.class,
-                () -> this.transitionService.getProcessStateAndActions(processInstanceList, true));
+                () -> this.transitionService.getProcessStateAndActions(processInstanceList, true, false));
         verify(this.businessServiceRepository)
                 .getBusinessServices((org.egov.wf.web.models.BusinessServiceSearchCriteria) any());
     }
@@ -166,7 +166,7 @@ class TransitionServiceTest {
         ArrayList<ProcessInstance> processInstanceList = new ArrayList<>();
         processInstanceList.add(new ProcessInstance());
         assertThrows(CustomException.class,
-                () -> this.transitionService.getProcessStateAndActions(processInstanceList, true));
+                () -> this.transitionService.getProcessStateAndActions(processInstanceList, true, false));
         verify(this.workflowUtil).rolesAllowedInService((BusinessService) any());
         verify(this.worKflowRepository).getProcessInstances((org.egov.wf.web.models.ProcessInstanceSearchCriteria) any());
         verify(this.businessServiceRepository)

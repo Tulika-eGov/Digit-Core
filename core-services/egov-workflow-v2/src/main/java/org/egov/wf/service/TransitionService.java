@@ -45,7 +45,7 @@ public class TransitionService {
      * @return List of ProcessStateAndAction containing the State object for status before the action and after the action and
      * the Action object for the given action
      */
-    public List<ProcessStateAndAction> getProcessStateAndActions(List<ProcessInstance> processInstances,Boolean isTransitionCall){
+    public List<ProcessStateAndAction> getProcessStateAndActions(List<ProcessInstance> processInstances,Boolean isTransitionCall, Boolean isInit){
         List<ProcessStateAndAction> processStateAndActions = new LinkedList<>();
 
         BusinessService businessService = getBusinessService(processInstances);
@@ -69,7 +69,10 @@ public class TransitionService {
             //Assign businessSla when creating processInstance
             if(processStateAndAction.getProcessInstanceFromDb()==null && isTransitionCall)
                 processInstance.setBusinesssServiceSla(businessService.getBusinessServiceSla());
-
+            
+            if (isInit.equals(Boolean.TRUE)) {
+            	currentState = null;
+            }
 
             if(currentState==null){
                     for(State state : businessService.getStates()){
