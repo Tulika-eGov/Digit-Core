@@ -107,6 +107,9 @@ public class ProcessInstance   {
         /* for use of notification service in property*/
         @JsonProperty("notificationAction")
     	private String notificationAction;
+        
+        @JsonProperty("triggerSelectiveParallelWorkflows")
+        private String triggerSelectiveParallelWorkflows;
 
         public ProcessInstance addDocumentsItem(Document documentsItem) {
             if (this.documents == null) {
