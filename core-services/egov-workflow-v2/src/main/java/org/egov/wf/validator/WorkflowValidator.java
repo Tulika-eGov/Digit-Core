@@ -13,12 +13,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.egov.wf.util.WorkflowConstants.*;
 
-
+@Slf4j
 @Component
 public class WorkflowValidator {
 
@@ -160,7 +162,14 @@ public class WorkflowValidator {
              * Checks if in case of action causing transition the assignee has role that can take some action
              * in the resultant state
              */
-            List<String> nextStateRoles = getRolesFromState(processStateAndAction.getResultantState());
+			List<String> nextStateRoles = getRolesFromState(processStateAndAction.getResultantState());
+
+			List<String> parallelWorkflowRoles = getSelectedParallelWorkflowRoles(processStateAndAction, tenantId);
+			if (!CollectionUtils.isEmpty(parallelWorkflowRoles)) {
+				nextStateRoles.addAll(parallelWorkflowRoles);
+			}
+
+			log.info("Next state roles : " + nextStateRoles);
 
             if(isStateChanging && !CollectionUtils.isEmpty(processStateAndAction.getProcessInstanceFromRequest().getAssignes())){
                 processStateAndAction.getProcessInstanceFromRequest().getAssignes().forEach(assignee -> {
@@ -243,9 +252,34 @@ public class WorkflowValidator {
         }
 
     }
+    
+	private List<String> getSelectedParallelWorkflowRoles(ProcessStateAndAction processStateAndAction,
+			String tenantId) {
+		ProcessInstance processInstance = processStateAndAction.getProcessInstanceFromRequest();
+		if (processInstance != null && !StringUtils.isBlank(processInstance.getTriggerSelectiveParallelWorkflows())) {
+			String selectedParallelWorkflows = processInstance.getTriggerSelectiveParallelWorkflows();
 
+			log.info("Selected parallel workflows : " + selectedParallelWorkflows);
 
+			String[] parallelWorkflows = selectedParallelWorkflows.split(",");
+			for (String workflow : parallelWorkflows) {
+				BusinessService parallelBusinessService = businessUtil.getBusinessService(tenantId, workflow);
 
+				log.info("parallel workflow businessService : " + parallelBusinessService.getBusinessService());
 
+				if (parallelBusinessService == null || CollectionUtils.isEmpty(parallelBusinessService.getStates())) {
+					continue;
+				}
+				State state = parallelBusinessService.getStates().stream().filter(s -> "INITIATED".equals(s.getState()))
+						.findFirst().orElse(null);
 
+				log.info("parallel workflow state : " + state);
+
+				if (state != null) {
+					return util.getAllRolesFromState(state);
+				}
+			}
+		}
+		return Collections.emptyList();
+	}
 }

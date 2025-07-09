@@ -71,7 +71,7 @@ public class TransitionService {
                 processInstance.setBusinesssServiceSla(businessService.getBusinessServiceSla());
             
             if (Boolean.TRUE.equals(isInit)) {
-            	log.info("Initializing parallel workflow : ", currentState);
+            	log.info("Initializing parallel workflow : " + currentState);
             	currentState = null;
             }
 
@@ -97,8 +97,8 @@ public class TransitionService {
             }
 
 
-            log.info("Current state : ", currentState);
-            log.info("Process state action : ", processStateAndAction.getAction());
+            log.info("Current state : " + currentState);
+            log.info("Process state action : " + processStateAndAction.getAction());
             
             if(isTransitionCall){
                 if(processStateAndAction.getAction()==null)
