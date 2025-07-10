@@ -37,6 +37,9 @@ public class SMSProperties {
 
     @Value("${sms.sender.secure.key}")
     public String secureKey;
+    
+    @Value("${sms.provider.header.authorization}")
+    public boolean isHeaderAuthorization;
 
     @Value("#{${sms.config.map}}")
     Map<String, String> configMap;
