@@ -175,6 +175,9 @@ public class WorkflowValidator {
                 processStateAndAction.getProcessInstanceFromRequest().getAssignes().forEach(assignee -> {
                     List<Role> assigneeRoles = assignee.getRoles();
                     Boolean isRoleAvailableInNextState = util.isRoleAvailable(tenantId,assigneeRoles,nextStateRoles);
+                    
+                    log.info("Role available in next state : " + isRoleAvailableInNextState);
+                    
                     if(!isRoleAvailableInNextState)
                         throw new CustomException("INVALID_ASSIGNEE","Cannot assign to the user: "+ assignee.getUuid());
 
@@ -262,6 +265,9 @@ public class WorkflowValidator {
 			log.info("Selected parallel workflows : " + selectedParallelWorkflows);
 
 			String[] parallelWorkflows = selectedParallelWorkflows.split(",");
+
+			List<String> roles = new ArrayList<>();
+
 			for (String workflow : parallelWorkflows) {
 				BusinessService parallelBusinessService = businessUtil.getBusinessService(tenantId, workflow);
 
@@ -276,9 +282,13 @@ public class WorkflowValidator {
 				log.info("parallel workflow state : " + state);
 
 				if (state != null) {
-					return util.getAllRolesFromState(state);
+					List<String> stateRoles = util.getAllRolesFromState(state);
+					if (!CollectionUtils.isEmpty(stateRoles)) {
+						roles.addAll(stateRoles);
+					}
 				}
 			}
+			return roles;
 		}
 		return Collections.emptyList();
 	}

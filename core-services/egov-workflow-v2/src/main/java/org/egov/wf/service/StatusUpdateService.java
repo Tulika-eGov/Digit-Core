@@ -1,22 +1,32 @@
 package org.egov.wf.service;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.egov.wf.config.WorkflowConfig;
 import org.egov.wf.producer.Producer;
 import org.egov.wf.util.BusinessUtil;
-import org.egov.wf.web.models.*;
+import org.egov.wf.util.WorkflowUtil;
+import org.egov.wf.web.models.Action;
+import org.egov.wf.web.models.BusinessService;
+import org.egov.wf.web.models.ProcessInstance;
+import org.egov.wf.web.models.ProcessInstanceRequest;
+import org.egov.wf.web.models.ProcessStateAndAction;
+import org.egov.wf.web.models.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 @Service
 public class StatusUpdateService {
 
@@ -27,13 +37,17 @@ public class StatusUpdateService {
 	private BusinessUtil businessUtil;
 
 	private WorkflowService workflowService;
+	
+	private WorkflowUtil workflowUtil;
 
 	@Autowired
-	public StatusUpdateService(Producer producer, WorkflowConfig config, BusinessUtil businessUtil, @Lazy WorkflowService workflowService) {
+	public StatusUpdateService(Producer producer, WorkflowConfig config, BusinessUtil businessUtil,
+			@Lazy WorkflowService workflowService, WorkflowUtil workflowUtil) {
 		this.producer = producer;
 		this.config = config;
 		this.businessUtil = businessUtil;
 		this.workflowService = workflowService;
+		this.workflowUtil = workflowUtil;
 	}
 
 
@@ -113,11 +127,36 @@ public class StatusUpdateService {
 	}
 
 	private void triggerParallelWorkflow(RequestInfo requestInfo, ProcessInstance processInstanceFromRequest, String parallelWorkflow, String action) {
+		List<User> filteredAssignees = null;
+		BusinessService parallelBusinessService = businessUtil
+				.getBusinessService(processInstanceFromRequest.getTenantId(), parallelWorkflow);
+
+		if (parallelBusinessService != null) {
+			State state = parallelBusinessService.getStates().stream().filter(s -> "INITIATED".equals(s.getState()))
+					.findFirst().orElse(null);
+
+			List<String> stateRoles = workflowUtil.getAllRolesFromState(state);
+
+			log.info("State and roles for parallel workflow : " + state + "=>" + stateRoles);
+
+			if (!CollectionUtils.isEmpty(stateRoles)) {
+				List<User> assignees = processInstanceFromRequest.getAssignes();
+				if (!CollectionUtils.isEmpty(assignees)) {
+					filteredAssignees = assignees.stream().filter(
+							user -> user.getRoles().stream().anyMatch(role -> stateRoles.contains(role.getCode())))
+							.toList();
+				}
+			}
+		}
+
+		log.info("Assignee for parallel workflow : " + filteredAssignees);
+		
 		ProcessInstance processInstance = ProcessInstance.builder().businessService(parallelWorkflow)
 				.businessId(processInstanceFromRequest.getBusinessId())
 				.action(action)
 				.moduleName(processInstanceFromRequest.getModuleName())
 				.tenantId(processInstanceFromRequest.getTenantId())
+				.assignes(filteredAssignees)
 				.build();
 		List<ProcessInstance> processInstances = new LinkedList<>();
 		processInstances.add(processInstance);
