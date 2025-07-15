@@ -156,7 +156,7 @@ public class WorkflowValidator {
                         .contains(requestInfo.getUserInfo().getUuid());
             }
 
-
+            log.info("Next state : " + processStateAndAction.getResultantState());
 
             /**
              * Checks if in case of action causing transition the assignee has role that can take some action
@@ -202,16 +202,13 @@ public class WorkflowValidator {
     }
 
 
-    private List<String> getRolesFromState(State state){
-        List<String> transitionRoles = new LinkedList<>();
-        if(!CollectionUtils.isEmpty(state.getActions())){
-            state.getActions().forEach(action -> {
-                if(!action.getCurrentState().equalsIgnoreCase(action.getNextState()))
-                    transitionRoles.addAll(action.getRoles());
-            });
-        }
-        return transitionRoles;
-    }
+	private List<String> getRolesFromState(State state) {
+		List<String> transitionRoles = new LinkedList<>();
+		if (!CollectionUtils.isEmpty(state.getActions())) {
+			state.getActions().forEach(action -> transitionRoles.addAll(action.getRoles()));
+		}
+		return transitionRoles;
+	}
 
 
     /**
