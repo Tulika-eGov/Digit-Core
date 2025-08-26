@@ -1,11 +1,11 @@
 const envVariables = {
   MAX_NUMBER_PAGES: process.env.MAX_NUMBER_PAGES || 80,
   EGOV_LOCALISATION_HOST:
-    process.env.EGOV_LOCALISATION_HOST || "http://egov-localization:8080/",
+    process.env.EGOV_LOCALISATION_HOST || "http://localhost:8086/",
   EGOV_LOCALISATION_SEARCH:
     process.env.EGOV_LOCALISATION_SEARCH || "localization/messages/v2/_search",
   EGOV_FILESTORE_SERVICE_HOST:
-    process.env.EGOV_FILESTORE_SERVICE_HOST || "http://egov-filestore:8080",
+    process.env.EGOV_FILESTORE_SERVICE_HOST || "http://localhost:8002",
   SERVER_PORT: process.env.SERVER_PORT || 8080,
 
   KAFKA_BROKER_HOST: process.env.KAFKA_BROKER_HOST || "localhost:9092",
@@ -21,18 +21,18 @@ const envVariables = {
   DB_USER: process.env.DB_USER || "postgres",
   DB_PASSWORD: process.env.DB_PASSWORD || "postgres",
   DB_HOST: process.env.DB_HOST || "localhost",
-  DB_NAME: process.env.DB_NAME || "PdfGen",
+  DB_NAME: process.env.DB_NAME || "postgres",
   DB_PORT: process.env.DB_PORT || 5432,
-  EGOV_EXTERNAL_HOST: process.env.EGOV_EXTERNAL_HOST || "https://dev.digit.org/" ,
+  EGOV_EXTERNAL_HOST: process.env.EGOV_EXTERNAL_HOST || "https://djibouti.tekdinext.com/" ,
   IS_ENVIRONMENT_CENTRAL_INSTANCE: process.env.IS_ENVIRONMENT_CENTRAL_INSTANCE || false,
   STATE_SCHEMA_INDEX_POSITION_TENANTID: process.env.STATE_SCHEMA_INDEX_POSITION_TENANTID || 1,
   SAVE_PDF_DIR: process.env.SAVE_PDF_DIR || '/mnt/pdf/',
   DEFAULT_LOCALISATION_LOCALE:
     process.env.DEFAULT_LOCALISATION_LOCALE || "en_IN",
     DEFAULT_LOCALISATION_TENANT:
-    process.env.DEFAULT_LOCALISATION_TENANT || "pb",
-    DATA_CONFIG_URLS: process.env.DATA_CONFIG_URLS ,
-    FORMAT_CONFIG_URLS: process.env.FORMAT_CONFIG_URLS ,
-    STATE_LEVEL_TENANT_ID: "in.stateb"
+    process.env.DEFAULT_LOCALISATION_TENANT || "dj",
+    DATA_CONFIG_URLS: process.env.DATA_CONFIG_URLS,
+    FORMAT_CONFIG_URLS: process.env.FORMAT_CONFIG_URLS,
+    STATE_LEVEL_TENANT_ID: "dj"
 };
 export default envVariables;
