@@ -62,17 +62,17 @@ console.log(`Total Heap Size ~ ${totalHeapSizeInGB} GB`);
 console.log(`*******************************************`);
 
 
-
+ 
 var jp = require("jsonpath");
 //create binary
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.vfs = pdfFonts.vfs;
 var pdfMakePrinter = require("pdfmake/src/printer");
 
 let app = express();
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json({
   limit: "200mb",
-  extended: true
+  extended: true 
 }));
 app.use(bodyParser.urlencoded({
   limit: "200mb",
@@ -91,7 +91,7 @@ let formatConfigMap = {};
 
 let topicKeyMap = {};
 var topic = [];
-var datafileLength = dataConfigUrls.split(",").length;
+var datafileLength = dataConfigUrls ? dataConfigUrls.split(",").length : 0;
 let unregisteredLocalisationCodes = [];
 
 var fontDescriptors = {
