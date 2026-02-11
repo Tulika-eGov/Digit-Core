@@ -295,6 +295,39 @@ public class IndividualService {
             Long lastChangedSince,
             Boolean includeDeleted,
             RequestInfo requestInfo) {
+        if (requestInfo.getUserInfo() != null && individualSearch != null) {
+            User userInfo = requestInfo.getUserInfo();
+            boolean isAuthorized = !CollectionUtils.isEmpty(userInfo.getRoles()) &&
+                    userInfo.getRoles().stream()
+                            .anyMatch(role -> StringUtils.equalsIgnoreCase(role.getCode(), "STUDIO_ADMIN") ||
+                                    StringUtils.equalsIgnoreCase(role.getCode(), "BPA_ARCHITECT"));
+
+            if (!isAuthorized) {
+                String currentUserUuid = userInfo.getUuid();
+                String currentUserId = userInfo.getId() != null ? String.valueOf(userInfo.getId()) : null;
+
+                if (!CollectionUtils.isEmpty(individualSearch.getUserUuid())
+                        && (!individualSearch.getUserUuid().contains(currentUserUuid)
+                                || individualSearch.getUserUuid().size() > 1)) {
+                    throw new CustomException("UNAUTHORIZED_ACCESS",
+                            "You are not authorized to search for other users' data. Please contact your administrator.");
+                }
+
+                if (!CollectionUtils.isEmpty(individualSearch.getUserId())) {
+                    boolean matches = individualSearch.getUserId().stream()
+                            .anyMatch(id -> StringUtils.equalsIgnoreCase(String.valueOf(id), currentUserId));
+                    if (!matches || individualSearch.getUserId().size() > 1) {
+                        throw new CustomException("UNAUTHORIZED_ACCESS",
+                                "You are not authorized to search for other users' data. Please contact your administrator.");
+                    }
+                }
+
+                if (CollectionUtils.isEmpty(individualSearch.getUserUuid())
+                        && CollectionUtils.isEmpty(individualSearch.getUserId())) {
+                    individualSearch.setUserUuid(Collections.singletonList(currentUserUuid));
+                }
+            }
+        }
         SearchResponse<Individual> searchResponse = null;
 
         String idFieldName = getIdFieldName(individualSearch);
